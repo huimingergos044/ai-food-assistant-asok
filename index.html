@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="รายงานวิเคราะห์และจัดอันดับร้านอาหารสำหรับทีม 8–12 คนในย่านอโศก">
+  <title>AI Food Assistant — Asok</title>
+  <style>
+    :root{--bg:#f6f4ef;--ink:#17201c;--muted:#65716a;--card:#fff;--brand:#1f6b4f;--gold:#d59b38;--line:#dfe5df;--warn:#8a5b00}
+    *{box-sizing:border-box}body{margin:0;font-family:system-ui,"Noto Sans Thai",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+    main{max-width:1180px;margin:auto;padding:28px 20px 64px}header{padding:42px;border-radius:24px;background:linear-gradient(135deg,#103c2e,#247556);color:#fff}
+    h1{font-size:clamp(2rem,5vw,4rem);margin:0 0 8px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:#cde8db;font-weight:700}.meta,.muted{color:var(--muted)}header .meta{color:#d9eee5}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card,section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}section{margin-top:20px}h2{margin-top:0}
+    ol.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:0;list-style:none}.flow li{padding:14px;border-radius:12px;background:#eef5f1;text-align:center}
+    .rank{font-size:2rem;color:var(--gold);font-weight:800}.score{font-size:1.7rem;font-weight:800;color:var(--brand)}
+    .table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:.85rem;background:#f8faf8}
+    a{color:var(--brand);text-underline-offset:2px}.notice{background:#fff3d6;border-color:#e9c66e}.notice.error{background:#fdebea;border-color:#e3a19d}.notice.success{background:#eaf6ef;border-color:#9ccbb0}
+    .pills span{display:inline-block;padding:6px 10px;background:#eef5f1;border-radius:999px;margin:3px}.comparison{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.ok{color:#176743}.warn{color:var(--warn)}
+    .evidence-links a{display:inline-block;margin:4px 8px 4px 0}.subscores{white-space:nowrap;font-size:.86rem}.callout{padding:10px 12px;border-left:4px solid var(--gold);background:#fff8e9;border-radius:6px}
+    @media(max-width:760px){.grid,.comparison{grid-template-columns:1fr}ol.flow{grid-template-columns:1fr 1fr}header{padding:28px}section{padding:18px}.table-wrap{margin:0 -6px}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">AI Food Assistant</div>
+    <h1>มื้อทีมย่านอโศก</h1>
+    <p>ค้นหา วิเคราะห์ และจัดอันดับร้านอาหารสำหรับทีม 8–12 คนหลังเลิกงาน</p>
+    <div class="meta"><span id="author">Poomkamol Yensoung</span> · <span id="date">18/7/2026</span> · Asok, Bangkok</div>
+  </header>
+
+  <section>
+    <h2>เป้าหมาย</h2>
+    <p>ตอบคำถามว่า “ถ้าทีมต้องเลือกร้าน 1–3 ร้านในอโศก ร้านไหนเหมาะที่สุดและเพราะอะไร” ด้วยข้อมูลจริง รีวิวจริง และหลักฐานที่ตรวจสอบย้อนกลับได้</p>
+  </section>
+
+  <section>
+    <h2>ภาพรวม Workflow</h2>
+    <ol class="flow">
+      <li>1. Apify<br>เก็บข้อมูล</li><li>2. Sheets<br>Raw data</li><li>3. ChatGPT<br>Clean & QA</li><li>4. n8n<br>Automation</li><li>5. HTML<br>Recommendation</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>เครื่องมือที่ใช้</h2>
+    <div class="pills">
+      <span>Apify — เก็บข้อมูลร้าน</span><span>Google Sheets — Raw/Clean/Scoring</span><span>ChatGPT — Cleaning & Analysis</span><span>n8n — Automation</span><span>HTML/CSS/JS — Final Report</span><span>Netlify/Vercel — Deployment</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>แหล่งข้อมูลและหลักฐาน</h2>
+    <p class="evidence-links">
+      <a href="https://console.apify.com/storage/datasets/zU2K0xneUHcQVGHCP" target="_blank" rel="noopener noreferrer">แหล่งที่ 1 / Apify Dataset</a>
+      <a href="https://console.apify.com/storage/datasets/MjQpDqHIL9AQoZpDA" target="_blank" rel="noopener noreferrer">แหล่งที่ 2 / Apify Dataset</a>
+      <a href="https://docs.google.com/spreadsheets/d/1rs6yom0oTP998lmAjZPlT0hYbn-aI8h4-cvXp3y71tg/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Google Sheets</a>
+    </p>
+    <p class="muted">ข้อมูลร้านและคะแนนแสดงจากแท็บ Scoring; ลิงก์หลักฐานรายร้านอยู่ในตาราง Top 10</p>
+  </section>
+
+  <section>
+    <h2>เกณฑ์การให้คะแนน 100 คะแนน</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>เกณฑ์</th><th>คะแนนเต็ม</th><th>ข้อมูลที่ใช้พิจารณา</th></tr></thead>
+      <tbody>
+        <tr><td>Rating & Review Quality</td><td>25</td><td>rating, review_count และความน่าเชื่อถือของ source URL</td></tr>
+        <tr><td>Group Suitability</td><td>20</td><td>group_evidence, การรองรับกลุ่ม, การจองโต๊ะหรือห้องส่วนตัว</td></tr>
+        <tr><td>Price Suitability</td><td>15</td><td>price_level และความเหมาะสมกับงบมื้อทีม</td></tr>
+        <tr><td>Travel Convenience</td><td>15</td><td>distance_m และการเดินทางจาก BTS/MRT อโศก</td></tr>
+        <tr><td>Data Completeness</td><td>15</td><td>ความครบของ field สำคัญและ source URL</td></tr>
+        <tr><td>Uniqueness / Experience</td><td>10</td><td>หลักฐานประสบการณ์ที่โดดเด่นและเหมาะกับทีม</td></tr>
+        <tr><td><strong>รวม</strong></td><td><strong>100</strong></td><td>ผลรวมคะแนนทั้ง 6 หมวด โดยไม่เปลี่ยนน้ำหนัก</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="status" class="notice" aria-live="polite">
+    <strong>กำลังโหลดข้อมูลจาก Google Sheets…</strong>
+    <p>หากข้อความนี้ไม่หาย โปรดตรวจสิทธิ์ Share และชื่อ header ในแท็บ Scoring/Clean_Data</p>
+  </section>
+
+  <section>
+    <h2>Top 3 Recommendations</h2>
+    <div class="grid" id="top3"><p class="muted">กำลังโหลดข้อมูล…</p></div>
+  </section>
+
+  <section>
+    <h2>Top 10 Ranking</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>ร้าน</th><th>ประเภท</th><th>คะแนนรวม</th><th>คะแนนย่อย</th><th>Rating</th><th>ราคา</th><th>เดินทาง/ยืนยันก่อนจอง</th><th>หลักฐาน</th></tr></thead>
+      <tbody id="ranking"><tr><td colspan="9" class="muted">กำลังโหลดข้อมูล…</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Restaurant Comparison</h2>
+    <div class="comparison" id="comparison"><p class="muted">กำลังโหลดข้อมูล…</p></div>
+  </section>
+</main>
+
+<script>
+const SPREADSHEET_ID='1rs6yom0oTP998lmAjZPlT0hYbn-aI8h4-cvXp3y71tg';
+
+// โหลดข้อมูลผ่าน Google Visualization script endpoint แทน fetch CSV
+// จึงเปิดได้ทั้งจากไฟล์ index.html บนเครื่องและจากเว็บที่ Deploy แล้วโดยไม่ติด CORS
+function loadGoogleSheet(sheetName){
+  return new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    const timer=setTimeout(()=>{script.remove();reject(new Error(`โหลดแท็บ ${sheetName} หมดเวลา`))},15000);
+    window.google=window.google||{};
+    window.google.visualization=window.google.visualization||{};
+    window.google.visualization.Query={setResponse(response){
+      clearTimeout(timer);script.remove();
+      if(!response||response.status==='error'){
+        const detail=response?.errors?.map(e=>e.detailed_message||e.message).join('; ')||'Google Sheets ไม่อนุญาตให้อ่านข้อมูล';
+        reject(new Error(`แท็บ ${sheetName}: ${detail}`));return;
+      }
+      const table=response.table||{};
+      const headers=(table.cols||[]).map(c=>(c.label||c.id||'').trim());
+      const rows=(table.rows||[]).map(row=>Object.fromEntries(headers.map((h,i)=>{
+        const cell=row.c?.[i];
+        return [h,cell==null?'':String(cell.v??cell.f??'')];
+      })));
+      resolve(rows);
+    }};
+    script.onerror=()=>{clearTimeout(timer);script.remove();reject(new Error(`เปิดแท็บ ${sheetName} ไม่สำเร็จ — ตรวจ Share permission`))};
+    script.src=`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+    document.head.appendChild(script);
+  });
+}
+
+function esc(x=''){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function evidenceLinks(value=''){
+  const urls=String(value).split(/\s*\|\s*/).filter(u=>/^https?:\/\//i.test(u));
+  return urls.length?urls.map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">แหล่งข้อมูล${urls.length>1?' '+(i+1):''}</a>`).join('<br>'):'<span class="muted">ไม่มีลิงก์</span>';
+}
+function subscoreText(r){return `Rating ${esc(r.rating_score||'–')}/25 · Group ${esc(r.group_score||'–')}/20 · Price ${esc(r.price_score||'–')}/15 · Travel ${esc(r.travel_score||'–')}/15 · Data ${esc(r.data_score||'–')}/15 · Experience ${esc(r.experience_score||'–')}/10`}
+
+async function run(){
+  const status=document.querySelector('#status');
+  try{
+    const scoringRows=await loadGoogleSheet('Scoring');
+    const cleanRows=await loadGoogleSheet('Clean_Data');
+    const sourceById=new Map(cleanRows.map(r=>[r.restaurant_id,r.source_urls||'']));
+    const allRows=scoringRows.filter(r=>r.restaurant_name).map(r=>({...r,source_urls:r.source_urls||sourceById.get(r.restaurant_id)||''}));
+    const required=['restaurant_name','total_score','recommendation_reason','trade_off','source_urls'];
+    const missing=required.filter(k=>!allRows.length||!(k in allRows[0]));
+    if(missing.length)throw new Error(`CSV ขาด header: ${missing.join(', ')}`);
+    const rows=allRows.sort((a,b)=>(+b.total_score)-(+a.total_score)||(+a.ranking)-(+b.ranking)).slice(0,10);
+    if(rows.length<10)throw new Error(`พบข้อมูลเพียง ${rows.length} ร้าน ต้องมีอย่างน้อย 10 ร้าน`);
+
+    document.querySelector('#top3').innerHTML=rows.slice(0,3).map((r,i)=>`<article class="card">
+      <div class="rank">#${i+1}</div><h3>${esc(r.restaurant_name)}</h3><div class="score">${esc(r.total_score)}/100</div>
+      <p><b>เหตุผล:</b> ${esc(r.recommendation_reason||'ไม่มีข้อมูล')}</p>
+      <p class="warn"><b>ข้อควรระวัง:</b> ${esc(r.trade_off||'ไม่มีข้อมูล')}</p>
+      <p class="callout"><b>ควรยืนยันก่อนจอง:</b> ${esc(r.travel_note||'ไม่มีข้อมูล')}</p>
+      <p>${evidenceLinks(r.source_urls)}</p></article>`).join('');
+
+    document.querySelector('#ranking').innerHTML=rows.map((r,i)=>`<tr>
+      <td>${i+1}</td><td><b>${esc(r.restaurant_name)}</b></td><td>${esc(r.food_type||'–')}</td><td><b>${esc(r.total_score)}</b></td>
+      <td class="subscores">${subscoreText(r)}</td><td>${esc(r.rating||'–')}</td><td>${esc(r.price_level||'–')}</td><td>${esc(r.travel_note||'–')}</td><td>${evidenceLinks(r.source_urls)}</td>
+    </tr>`).join('');
+
+    document.querySelector('#comparison').innerHTML=rows.slice(0,3).map(r=>`<article class="card"><h3>${esc(r.restaurant_name)}</h3>
+      <p class="ok"><b>จุดเด่น:</b> ${esc(r.recommendation_reason||'ไม่มีข้อมูล')}</p>
+      <p class="warn"><b>Trade-off:</b> ${esc(r.trade_off||'ไม่มีข้อมูล')}</p>
+      <p><b>คะแนน:</b> ${subscoreText(r)}</p></article>`).join('');
+
+    status.className='notice success';status.innerHTML=`<strong>โหลดข้อมูลสำเร็จ</strong><p>แสดง Top 10 จากข้อมูล ${allRows.length} ร้านใน Google Sheets</p>`;
+  }catch(e){
+    status.className='notice error';status.innerHTML=`<strong>โหลดข้อมูลไม่สำเร็จ</strong><p>${esc(e.message)} — ตรวจ Share permission และชื่อ header ในแท็บ Scoring/Clean_Data</p>`;
+    document.querySelector('#top3').innerHTML='<p class="muted">ยังไม่มีข้อมูลแสดง</p>';
+    document.querySelector('#ranking').innerHTML='<tr><td colspan="9" class="muted">ยังไม่มีข้อมูลแสดง</td></tr>';
+    document.querySelector('#comparison').innerHTML='<p class="muted">ยังไม่มีข้อมูลแสดง</p>';
+  }
+}
+run();
+</script>
+</body>
+</html>
